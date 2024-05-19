@@ -25,7 +25,8 @@ This script is provided as-is without any warranties. Use it at your own risk. T
 
 ## Contributors
 - ## Contributors
-- [Sathariels] and [AkashCyber08] - [Nithilan.dev](https://nithilan.dev)
+- [Sathariels] and [AkashCyber08] -
+- [Nithilan.dev](https://nithilan.dev)
 - [AkashCyber08](https://github.com/Akashcyber08)
 
 
