@@ -4,7 +4,7 @@
 This Python script converts PDF files into TNS files, suitable for use in Texas Instruments calculators. It extracts text and images from the PDF and saves them into a TNS file structure.
 
 ## Requirements
-- Python 3.x
+- Python 3.9
 - PyPDF2 library (`pip install PyPDF2`)
 - Pillow library (`pip install Pillow`)
 
