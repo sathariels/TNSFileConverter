@@ -24,7 +24,10 @@ This Python script converts PDF files into TNS files, suitable for use in Texas 
 This script is provided as-is without any warranties. Use it at your own risk. The authors are not responsible for any damage or loss resulting from the use of this script.
 
 ## Contributors
-- [Sathariels] - [Nithilan.dev]
+- ## Contributors
+- [Sathariels] and [AkashCyber08] - [Nithilan.dev](https://nithilan.dev)
+- [AkashCyber08](https://github.com/Akashcyber08)
+
 
 Feel free to contribute to this project by forking and submitting pull requests.
 
