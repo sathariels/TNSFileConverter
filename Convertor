@@ -1,33 +1,57 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton, QFileDialog
-from PyQt5.QtCore import Qt, QMimeData
+
+from PyQt5.QtGui import QFont
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton
+from PyQt5.QtCore import Qt
 
 class ConverterGUI(QMainWindow):
     def __init__(self):
         super().__init__()
+        # Set the window title
         self.setWindowTitle("File Converter")
-        self.setGeometry(100, 100, 400, 200)
-
+        # Set the geometry of the window (x, y, width, height)
+        self.setGeometry(400, 300, 500, 300)
+        # Create the central widget and set it for the main window
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
+        # Create a vertical layout and set it for the central widget
         self.layout = QVBoxLayout()
         self.centralWidget.setLayout(self.layout)
+        # Initialize an empty list to store file paths
+        self.files = []
+        # Create the drag and drop box
+        self.createDragDropBox()
+        # Create the file list box to display the list of files
+        self.createFileListBox()
+        # Create the convert button
+        self.createConvertButton()
 
+    def createDragDropBox(self):
+        # Create a QLabel widget to display the instruction for dragging and dropping PDF files
         self.dragDropLabel = QLabel("Drag and Drop PDF Files Here", alignment=Qt.AlignCenter)
-        self.dragDropLabel.setStyleSheet("border: 2px dashed #aaa; padding: 20px;")
+        self.dragDropLabel.setFont(QFont("Arial", 15))
+        # Apply styling to the QLabel to create a dashed border and padding
+        self.dragDropLabel.setStyleSheet("border: 2px dashed #aaa; padding: 10px;")
+        # Enable the QLabel to accept drops, allowing files to be dragged and dropped onto it
         self.dragDropLabel.setAcceptDrops(True)
+        # Assign custom event handlers to the QLabel for drag enter and drop events
         self.dragDropLabel.dragEnterEvent = self.dragEnterEvent
         self.dragDropLabel.dropEvent = self.dropEvent
-        self.layout.addWidget(self.dragDropLabel)
+        # Add the dragDropLabel to the layout with a weight of 2 out of 6, allocating vertical space
+        self.layout.addWidget(self.dragDropLabel, 2)  # 2/6 of the vertical space
 
-        self.fileNamesLabel = QLabel("", alignment=Qt.AlignCenter)
-        self.layout.addWidget(self.fileNamesLabel)
+    # 2/6 of the vertical space
 
+    def createFileListBox(self):
+        self.fileNamesLabel = QLabel("Files:", alignment=Qt.AlignTop)
+        self.fileNamesLabel.setFont(QFont("Arial", 15))
+        self.fileNamesLabel.setStyleSheet("border: 1px solid #aaa; padding: 10px;")
+        self.layout.addWidget(self.fileNamesLabel, 3)  # 3/6 of the vertical space
+
+    def createConvertButton(self):
         self.convertButton = QPushButton("Convert")
         self.convertButton.clicked.connect(self.convertFiles)
-        self.layout.addWidget(self.convertButton)
-
-        self.files = []
+        self.layout.addWidget(self.convertButton, 1)  # 1/6 of the vertical space
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -50,10 +74,10 @@ class ConverterGUI(QMainWindow):
             event.ignore()
 
     def updateFileNamesLabel(self):
-        self.fileNamesLabel.setText("\n".join(self.files))
+        fileNames = [filePath.split('/')[-1] for filePath in self.files]
+        self.fileNamesLabel.setText("\n".join(fileNames))
 
     def convertFiles(self):
-        # Implement PDF conversion logic using self.files list
         print("Converting PDF files:", self.files)
 
 def createGui():
