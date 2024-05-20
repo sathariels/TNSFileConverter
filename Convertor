@@ -8,59 +8,59 @@ class ConverterGUI(QMainWindow):
         self.setWindowTitle("File Converter")
         self.setGeometry(100, 100, 400, 200)
 
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
+        self.centralWidget = QWidget()
+        self.setCentralWidget(self.centralWidget)
         self.layout = QVBoxLayout()
-        self.central_widget.setLayout(self.layout)
+        self.centralWidget.setLayout(self.layout)
 
-        self.drag_drop_label = QLabel("Drag and Drop PDF Files Here", alignment=Qt.AlignCenter)
-        self.drag_drop_label.setStyleSheet("border: 2px dashed #aaa; padding: 20px;")
-        self.drag_drop_label.setAcceptDrops(True)
-        self.drag_drop_label.dragEnterEvent = self.drag_enter_event
-        self.drag_drop_label.dropEvent = self.drop_event
-        self.layout.addWidget(self.drag_drop_label)
+        self.dragDropLabel = QLabel("Drag and Drop PDF Files Here", alignment=Qt.AlignCenter)
+        self.dragDropLabel.setStyleSheet("border: 2px dashed #aaa; padding: 20px;")
+        self.dragDropLabel.setAcceptDrops(True)
+        self.dragDropLabel.dragEnterEvent = self.dragEnterEvent
+        self.dragDropLabel.dropEvent = self.dropEvent
+        self.layout.addWidget(self.dragDropLabel)
 
-        self.file_names_label = QLabel("", alignment=Qt.AlignCenter)
-        self.layout.addWidget(self.file_names_label)
+        self.fileNamesLabel = QLabel("", alignment=Qt.AlignCenter)
+        self.layout.addWidget(self.fileNamesLabel)
 
-        self.convert_button = QPushButton("Convert")
-        self.convert_button.clicked.connect(self.convert_files)
-        self.layout.addWidget(self.convert_button)
+        self.convertButton = QPushButton("Convert")
+        self.convertButton.clicked.connect(self.convertFiles)
+        self.layout.addWidget(self.convertButton)
 
         self.files = []
 
-    def drag_enter_event(self, event):
+    def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
             event.accept()
         else:
             event.ignore()
 
-    def drop_event(self, event):
+    def dropEvent(self, event):
         if event.mimeData().hasUrls():
             urls = event.mimeData().urls()
             for url in urls:
-                file_path = str(url.toLocalFile())
-                if file_path.lower().endswith('.pdf'):
-                    self.files.append(file_path)
+                filePath = str(url.toLocalFile())
+                if filePath.lower().endswith('.pdf'):
+                    self.files.append(filePath)
                 else:
-                    print("Unsupported file format:", file_path)
-            self.update_file_names_label()
+                    print("Unsupported file format:", filePath)
+            self.updateFileNamesLabel()
             event.accept()
         else:
             event.ignore()
 
-    def update_file_names_label(self):
-        self.file_names_label.setText("\n".join(self.files))
+    def updateFileNamesLabel(self):
+        self.fileNamesLabel.setText("\n".join(self.files))
 
-    def convert_files(self):
+    def convertFiles(self):
         # Implement PDF conversion logic using self.files list
         print("Converting PDF files:", self.files)
 
-def create_gui():
+def createGui():
     app = QApplication(sys.argv)
     gui = ConverterGUI()
     gui.show()
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
-    create_gui()
+    createGui()
