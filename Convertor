@@ -42,43 +42,52 @@ class ConverterGUI(QMainWindow):
 
     # 2/6 of the vertical space
 
-    def createFileListBox(self):
-        self.fileNamesLabel = QLabel("Files:", alignment=Qt.AlignTop)
-        self.fileNamesLabel.setFont(QFont("Arial", 15))
-        self.fileNamesLabel.setStyleSheet("border: 1px solid #aaa; padding: 10px;")
-        self.layout.addWidget(self.fileNamesLabel, 3)  # 3/6 of the vertical space
+    def createFileListBox(self):  # Defines a method to create a file list display box
+        self.fileNamesLabel = QLabel("Files:", alignment=Qt.AlignTop)  # Creates a QLabel to display "Files:" with top alignment
+        self.fileNamesLabel.setFont(QFont("Arial", 15))  # Sets the font of the label to Arial with size 15
+        self.fileNamesLabel.setStyleSheet(
+            "border: 1px solid #aaa; padding: 10px;")  # Sets the style of the label with a border and padding
+        self.layout.addWidget(self.fileNamesLabel,
+                              3)  # Adds the label to the layout, taking up 3/6 of the vertical space
 
-    def createConvertButton(self):
-        self.convertButton = QPushButton("Convert")
-        self.convertButton.clicked.connect(self.convertFiles)
-        self.layout.addWidget(self.convertButton, 1)  # 1/6 of the vertical space
+    def createConvertButton(self):  # Defines a method to create a convert button
+        self.convertButton = QPushButton("Convert")  # Creates a QPushButton labeled "Convert"
+        self.convertButton.setFont(QFont("Arial", 15))  # Sets the font of the button to Arial with size 15
+        self.convertButton.clicked.connect(
+            self.convertFiles)  # Connects the button's click event to the convertFiles method
+        self.layout.addWidget(self.convertButton,
+                              1)  # Adds the button to the layout, taking up 1/6 of the vertical space
 
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.accept()
+    def dragEnterEvent(self, event):  # Defines a method to handle the event when a drag action enters the widget
+        if event.mimeData().hasUrls():  # Checks if the dragged data contains URLs
+            event.accept()  # Accepts the drag event if it contains URLs, indicating that the widget can handle the drop
         else:
-            event.ignore()
+            event.ignore()  # Ignores the drag event if it does not contain URLs, indicating that the widget cannot handle the drop
 
-    def dropEvent(self, event):
-        if event.mimeData().hasUrls():
-            urls = event.mimeData().urls()
-            for url in urls:
-                filePath = str(url.toLocalFile())
-                if filePath.lower().endswith('.pdf'):
-                    self.files.append(filePath)
+    def dropEvent(self, event):  # Defines a method named dropEvent which takes an event object as input
+        if event.mimeData().hasUrls():  # Checks if the event contains URLs in its mime data
+            urls = event.mimeData().urls()  # Retrieves the URLs from the event's mime data
+            for url in urls:  # Iterates through each URL
+                filePath = str(url.toLocalFile())  # Converts the URL to a local file path as a string
+                if filePath.lower().endswith('.pdf'):  # Checks if the file path ends with '.pdf'
+                    self.files.append(filePath)  # Appends the file path to a list named 'files'
                 else:
-                    print("Unsupported file format:", filePath)
-            self.updateFileNamesLabel()
-            event.accept()
+                    print("Unsupported file format:", filePath)  # Prints a message for unsupported file formats
+                    # Need to create a label for Error Handeling
+            self.updateFileNamesLabel()  # Calls a method to update the label displaying file names
+            event.accept()  # Indicates that the event has been processed
         else:
             event.ignore()
 
-    def updateFileNamesLabel(self):
-        fileNames = [filePath.split('/')[-1] for filePath in self.files]
-        self.fileNamesLabel.setText("\n".join(fileNames))
+    def updateFileNamesLabel(self):  # Defines a method to update the label displaying the file names
+        fileNames = [filePath.split('/')[-1] for filePath in
+                     self.files]  # Creates a list of file names by extracting the last part of each file path
+        self.fileNamesLabel.setText(
+            "\n".join(fileNames))  # Sets the label's text to the joined list of file names, separated by newlines
 
-    def convertFiles(self):
-        print("Converting PDF files:", self.files)
+    def convertFiles(self):  # Defines a method to handle the conversion of files
+        print("Converting PDF files:",self.files)  # Prints a message indicating the conversion process along with the list of files
+
 
 def createGui():
     app = QApplication(sys.argv)
