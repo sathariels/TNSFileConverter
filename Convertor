@@ -91,8 +91,7 @@ class ConverterGUI(QMainWindow):
                 convertor.convertToTns()  # Calls the convertToTns method to convert the file
                 print("yaya")  # Prints a success message if the conversion is successful
             except Exception as e:  # Catches any exceptions that occur during conversion
-                print(
-                    "Error occurred during conversion:")  # Prints an error message indicating an issue with conversion
+                print("Error occurred during conversion:")  # Prints an error message indicating an issue with conversion
                 print(e)  # Prints the specific exception message for debugging purposes
 
 
