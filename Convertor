@@ -1,9 +1,9 @@
-import sys
 
+import sys
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton
 from PyQt5.QtCore import Qt
-
+import fitz
 class ConverterGUI(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -82,11 +82,46 @@ class ConverterGUI(QMainWindow):
     def updateFileNamesLabel(self):  # Defines a method to update the label displaying the file names
         fileNames = [filePath.split('/')[-1] for filePath in
                      self.files]  # Creates a list of file names by extracting the last part of each file path
-        self.fileNamesLabel.setText(
-            "\n".join(fileNames))  # Sets the label's text to the joined list of file names, separated by newlines
+        self.fileNamesLabel.setText("\n".join(fileNames))  # Sets the label's text to the joined list of file names, separated by newlines
 
     def convertFiles(self):  # Defines a method to handle the conversion of files
-        print("Converting PDF files:",self.files)  # Prints a message indicating the conversion process along with the list of files
+        for filesPath in self.files:  # Iterates through each file path in the list of files
+            convertor = pdfTOTnsConvertor(filesPath, filesPath + ".tns")  # Creates an instance of pdfTOTnsConvertor for the current file
+            try:
+                convertor.convertToTns()  # Calls the convertToTns method to convert the file
+                print("yaya")  # Prints a success message if the conversion is successful
+            except Exception as e:  # Catches any exceptions that occur during conversion
+                print(
+                    "Error occurred during conversion:")  # Prints an error message indicating an issue with conversion
+                print(e)  # Prints the specific exception message for debugging purposes
+
+
+class pdfTOTnsConvertor():
+    def __init__(self, pdfPath, tnsPath):
+        # Constructor method for the pdfTOTnsConvertor class.
+        # Initializes the object with paths to the PDF and TNS files.
+        self.pdfPath = pdfPath  # Assigns the path to the PDF file to the pdfPath attribute.
+        self.tnsPath = tnsPath  # Assigns the path to the TNS file to the tnsPath attribute.
+
+    def extractText(self):
+        doc = fitz.open(self.pdfPath) # opens the file in order ot modify it
+        text = "" # where the strings form the pdf are held
+        for pageNum in range(doc.page_count): # iterates through the pages of the document
+
+            page = doc.load_page(pageNum) # loads each page for error handleing
+            text += page.get_text() # gets the text from the pdf
+        return text # returns the text to the text varibale
+    def convertToTns(self):
+        text = self.extractText()# calls the extracted text from the extractText file
+        with open(self.tnsPath, 'w', encoding='utf-8') as tnsFile:
+            tnsFile.write(text)
+        # 'w' is a way to clear content of the pdf and write new text in it
+        # utf-8 is a way to handle a wide range of chartecters.
+        # with is used as a way of file handeling. Make sure that the file is cloased after its use.
+        # tnsFIle.write(text) write the text
+        # all this funciton does it get the text from the ectractText funtion opnes the file clears any writing and make sures all charecters are accepted. It then writes the text and closes the file.
+
+
 
 
 def createGui():
