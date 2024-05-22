@@ -73,7 +73,7 @@ class ConverterGUI(QMainWindow):
                     self.files.append(filePath)  # Appends the file path to a list named 'files'
                 else:
                     print("Unsupported file format:", filePath)  # Prints a message for unsupported file formats
-                    # Need to create a label for Error Handeling
+                    # Need to create a label for Error Handling
             self.updateFileNamesLabel()  # Calls a method to update the label displaying file names
             event.accept()  # Indicates that the event has been processed
         else:
@@ -107,18 +107,18 @@ class pdfTOTnsConvertor():
         text = "" # where the strings form the pdf are held
         for pageNum in range(doc.page_count): # iterates through the pages of the document
 
-            page = doc.load_page(pageNum) # loads each page for error handleing
+            page = doc.load_page(pageNum) # loads each page for error handling
             text += page.get_text() # gets the text from the pdf
-        return text # returns the text to the text varibale
+        return text # returns the text to the text variable
     def convertToTns(self):
         text = self.extractText()# calls the extracted text from the extractText file
         with open(self.tnsPath, 'w', encoding='utf-8') as tnsFile:
             tnsFile.write(text)
         # 'w' is a way to clear content of the pdf and write new text in it
-        # utf-8 is a way to handle a wide range of chartecters.
-        # with is used as a way of file handeling. Make sure that the file is cloased after its use.
+        # utf-8 is a way to handle a wide range of characters.
+        # with is used as a way of file handling. Make sure that the file is closed after its use.
         # tnsFIle.write(text) write the text
-        # all this funciton does it get the text from the ectractText funtion opnes the file clears any writing and make sures all charecters are accepted. It then writes the text and closes the file.
+        # all this function does it get the text from the ectractText function open the file clears any writing and make sures all characters are accepted. It then writes the text and closes the file.
 
 
 
