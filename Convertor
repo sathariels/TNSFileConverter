@@ -1,127 +1,134 @@
-
 import sys
 from PyQt5.QtGui import QFont
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton
 from PyQt5.QtCore import Qt
 import fitz
+import os
+import zipfile
+
+# Import the pdfTOTnsConvertor class from the PDF to TNS conversion part
+class PdfToTnsConverter:
+    def __init__(self, pdfPath, tnsPath):
+        # Initialize the converter with paths for the input PDF and output TNS file
+        self.pdfPath = pdfPath
+        self.tnsPath = tnsPath
+
+    def extractText(self):
+        # Open the PDF file
+        doc = fitz.open(self.pdfPath)
+        text = ""  # Initialize an empty string to hold the extracted text
+        # Iterate through each page in the PDF
+        for pageNum in range(doc.page_count):
+            page = doc.load_page(pageNum)  # Load the current page
+            text += page.get_text()  # Append the text from the current page to the text string
+        return text  # Return the extracted text
+
+    def createTnsFile(self, text):
+        # Define the XML structure for a simple TI-Nspire document
+        tnsContent = f"""<?xml version="1.0" encoding="utf-8"?>
+        <document xmlns="http://www.ti.com/Nspire-XML/3.0/">
+            <page>
+                <text>{text}</text>
+            </page>
+        </document>"""
+
+        # Create a temporary directory to hold the XML file
+        temp_dir = "temp_tns"
+        os.makedirs(temp_dir, exist_ok=True)  # Ensure the directory exists
+        xml_path = os.path.join(temp_dir, "document.xml")  # Path for the XML file
+
+        # Write the XML content to the file
+        with open(xml_path, 'w', encoding='utf-8') as xmlFile:
+            xmlFile.write(tnsContent)  # Write the XML content to the file
+
+        # Create the ZIP file with the .tns extension
+        with zipfile.ZipFile(self.tnsPath, 'w') as tnsFile:
+            tnsFile.write(xml_path, 'document.xml')  # Add the XML file to the ZIP archive
+
+        # Clean up the temporary directory
+        os.remove(xml_path)  # Remove the XML file
+        os.rmdir(temp_dir)  # Remove the temporary directory
+
+    def convertToTns(self):
+        # Extract text from the PDF
+        text = self.extractText()
+        # Create the TNS file with the extracted text
+        self.createTnsFile(text)
+
+    def convertToTns(self):
+        text = self.extractText()
+        with open(self.tnsPath, 'w', encoding='utf-8') as tnsFile:
+            tnsFile.write(text)
+
 class ConverterGUI(QMainWindow):
     def __init__(self):
         super().__init__()
-        # Set the window title
         self.setWindowTitle("File Converter")
-        # Set the geometry of the window (x, y, width, height)
         self.setGeometry(400, 300, 500, 300)
-        # Create the central widget and set it for the main window
         self.centralWidget = QWidget()
         self.setCentralWidget(self.centralWidget)
-        # Create a vertical layout and set it for the central widget
         self.layout = QVBoxLayout()
         self.centralWidget.setLayout(self.layout)
-        # Initialize an empty list to store file paths
         self.files = []
-        # Create the drag and drop box
         self.createDragDropBox()
-        # Create the file list box to display the list of files
         self.createFileListBox()
-        # Create the convert button
         self.createConvertButton()
 
     def createDragDropBox(self):
-        # Create a QLabel widget to display the instruction for dragging and dropping PDF files
         self.dragDropLabel = QLabel("Drag and Drop PDF Files Here", alignment=Qt.AlignCenter)
         self.dragDropLabel.setFont(QFont("Arial", 15))
-        # Apply styling to the QLabel to create a dashed border and padding
         self.dragDropLabel.setStyleSheet("border: 2px dashed #aaa; padding: 10px;")
-        # Enable the QLabel to accept drops, allowing files to be dragged and dropped onto it
         self.dragDropLabel.setAcceptDrops(True)
-        # Assign custom event handlers to the QLabel for drag enter and drop events
         self.dragDropLabel.dragEnterEvent = self.dragEnterEvent
         self.dragDropLabel.dropEvent = self.dropEvent
-        # Add the dragDropLabel to the layout with a weight of 2 out of 6, allocating vertical space
-        self.layout.addWidget(self.dragDropLabel, 2)  # 2/6 of the vertical space
+        self.layout.addWidget(self.dragDropLabel, 2)
 
-    # 2/6 of the vertical space
+    def createFileListBox(self):
+        self.fileNamesLabel = QLabel("Files:", alignment=Qt.AlignTop)
+        self.fileNamesLabel.setFont(QFont("Arial", 15))
+        self.fileNamesLabel.setStyleSheet("border: 1px solid #aaa; padding: 10px;")
+        self.layout.addWidget(self.fileNamesLabel, 3)
 
-    def createFileListBox(self):  # Defines a method to create a file list display box
-        self.fileNamesLabel = QLabel("Files:", alignment=Qt.AlignTop)  # Creates a QLabel to display "Files:" with top alignment
-        self.fileNamesLabel.setFont(QFont("Arial", 15))  # Sets the font of the label to Arial with size 15
-        self.fileNamesLabel.setStyleSheet(
-            "border: 1px solid #aaa; padding: 10px;")  # Sets the style of the label with a border and padding
-        self.layout.addWidget(self.fileNamesLabel,
-                              3)  # Adds the label to the layout, taking up 3/6 of the vertical space
+    def createConvertButton(self):
+        self.convertButton = QPushButton("Convert")
+        self.convertButton.setFont(QFont("Arial", 15))
+        self.convertButton.clicked.connect(self.convertFiles)
+        self.layout.addWidget(self.convertButton, 1)
 
-    def createConvertButton(self):  # Defines a method to create a convert button
-        self.convertButton = QPushButton("Convert")  # Creates a QPushButton labeled "Convert"
-        self.convertButton.setFont(QFont("Arial", 15))  # Sets the font of the button to Arial with size 15
-        self.convertButton.clicked.connect(
-            self.convertFiles)  # Connects the button's click event to the convertFiles method
-        self.layout.addWidget(self.convertButton,
-                              1)  # Adds the button to the layout, taking up 1/6 of the vertical space
-
-    def dragEnterEvent(self, event):  # Defines a method to handle the event when a drag action enters the widget
-        if event.mimeData().hasUrls():  # Checks if the dragged data contains URLs
-            event.accept()  # Accepts the drag event if it contains URLs, indicating that the widget can handle the drop
-        else:
-            event.ignore()  # Ignores the drag event if it does not contain URLs, indicating that the widget cannot handle the drop
-
-    def dropEvent(self, event):  # Defines a method named dropEvent which takes an event object as input
-        if event.mimeData().hasUrls():  # Checks if the event contains URLs in its mime data
-            urls = event.mimeData().urls()  # Retrieves the URLs from the event's mime data
-            for url in urls:  # Iterates through each URL
-                filePath = str(url.toLocalFile())  # Converts the URL to a local file path as a string
-                if filePath.lower().endswith('.pdf'):  # Checks if the file path ends with '.pdf'
-                    self.files.append(filePath)  # Appends the file path to a list named 'files'
-                else:
-                    print("Unsupported file format:", filePath)  # Prints a message for unsupported file formats
-                    # Need to create a label for Error Handling
-            self.updateFileNamesLabel()  # Calls a method to update the label displaying file names
-            event.accept()  # Indicates that the event has been processed
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.accept()
         else:
             event.ignore()
 
-    def updateFileNamesLabel(self):  # Defines a method to update the label displaying the file names
-        fileNames = [filePath.split('/')[-1] for filePath in
-                     self.files]  # Creates a list of file names by extracting the last part of each file path
-        self.fileNamesLabel.setText("\n".join(fileNames))  # Sets the label's text to the joined list of file names, separated by newlines
+    def dropEvent(self, event):
+        if event.mimeData().hasUrls():
+            urls = event.mimeData().urls()
+            for url in urls:
+                filePath = str(url.toLocalFile())
+                if filePath.lower().endswith('.pdf'):
+                    self.files.append(filePath)
+                else:
+                    print("Unsupported file format:", filePath)
+            self.updateFileNamesLabel()
+            event.accept()
+        else:
+            event.ignore()
 
-    def convertFiles(self):  # Defines a method to handle the conversion of files
-        for filesPath in self.files:  # Iterates through each file path in the list of files
-            convertor = pdfTOTnsConvertor(filesPath, filesPath + ".tns")  # Creates an instance of pdfTOTnsConvertor for the current file
+    def updateFileNamesLabel(self):
+        fileNames = [filePath.split('/')[-1] for filePath in self.files]
+        self.fileNamesLabel.setText("\n".join(fileNames))
+
+    def convertFiles(self):
+        for filePath in self.files:
+            tnsPath = filePath + ".tns"  # Define the TNS file path based on the PDF file path
+            convertor = PdfToTnsConverter(filePath, tnsPath)
             try:
-                convertor.convertToTns()  # Calls the convertToTns method to convert the file
-                print("yaya")  # Prints a success message if the conversion is successful
-            except Exception as e:  # Catches any exceptions that occur during conversion
-                print("Error occurred during conversion:")  # Prints an error message indicating an issue with conversion
-                print(e)  # Prints the specific exception message for debugging purposes
-
-
-class pdfTOTnsConvertor():
-    def __init__(self, pdfPath, tnsPath):
-        # Constructor method for the pdfTOTnsConvertor class.
-        # Initializes the object with paths to the PDF and TNS files.
-        self.pdfPath = pdfPath  # Assigns the path to the PDF file to the pdfPath attribute.
-        self.tnsPath = tnsPath  # Assigns the path to the TNS file to the tnsPath attribute.
-
-    def extractText(self):
-        doc = fitz.open(self.pdfPath) # opens the file in order ot modify it
-        text = "" # where the strings form the pdf are held
-        for pageNum in range(doc.page_count): # iterates through the pages of the document
-
-            page = doc.load_page(pageNum) # loads each page for error handling
-            text += page.get_text() # gets the text from the pdf
-        return text # returns the text to the text variable
-    def convertToTns(self):
-        text = self.extractText()# calls the extracted text from the extractText file
-        with open(self.tnsPath, 'w', encoding='utf-8') as tnsFile:
-            tnsFile.write(text)
-        # 'w' is a way to clear content of the pdf and write new text in it
-        # utf-8 is a way to handle a wide range of characters.
-        # with is used as a way of file handling. Make sure that the file is closed after its use.
-        # tnsFIle.write(text) write the text
-        # all this function does it get the text from the ectractText function open the file clears any writing and make sures all characters are accepted. It then writes the text and closes the file.
-
-
-
+                convertor.convertToTns()
+                print("Conversion successful:", tnsPath)
+            except Exception as e:
+                print("Error occurred during conversion:")
+                print(e)
 
 def createGui():
     app = QApplication(sys.argv)
