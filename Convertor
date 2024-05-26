@@ -26,7 +26,7 @@ class PdfToTnsConverter:
     def createTnsFile(self, text):
         # Define the XML structure for a simple TI-Nspire document
         tnsContent = f"""<?xml version="1.0" encoding="utf-8"?>
-        <document xmlns="http://www.ti.com/Nspire-XML/3.0/">
+        <document xmlns="https://www.ti.com/Nspire-XML/3.0/">
             <page>
                 <text>{text}</text>
             </page>
@@ -55,10 +55,6 @@ class PdfToTnsConverter:
         # Create the TNS file with the extracted text
         self.createTnsFile(text)
 
-    def convertToTns(self):
-        text = self.extractText()
-        with open(self.tnsPath, 'w', encoding='utf-8') as tnsFile:
-            tnsFile.write(text)
 
 class ConverterGUI(QMainWindow):
     def __init__(self):
