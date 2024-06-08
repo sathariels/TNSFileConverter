@@ -41,11 +41,7 @@ class PdfToTnsConverter:
 
         return xml_path
 
-    def convertToTns(self):
-        # Extract text from the PDF
-        text = self.extractText()
-        # Create the TNS file with the extracted text
-        self.createTnsFile(text)
+    
 
 
 class ConverterGUI(QMainWindow):
