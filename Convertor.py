@@ -23,31 +23,23 @@ class PdfToTnsConverter:
             text += page.get_text()  # Append the text from the current page to the text string
         return text  # Return the extracted text
 
-    def createTnsFile(self, text):
-        # Define the XML structure for a simple TI-Nspire document
-        tnsContent = f"""<?xml version="1.0" encoding="utf-8"?>
-        <document xmlns="https://www.ti.com/Nspire-XML/3.0/">
-            <page>
-                <text>{text}</text>
-            </page>
+    def createXmlFile(self, text):
+        # Define the XML structure for a simple document
+        xmlContent = f"""<?xml version="1.0" encoding="utf-8"?>
+        <document>
+            <text>{text}</text>
         </document>"""
 
         # Create a temporary directory to hold the XML file
-        temp_dir = "temp_tns"
+        temp_dir = "temp_xml"
         os.makedirs(temp_dir, exist_ok=True)  # Ensure the directory exists
         xml_path = os.path.join(temp_dir, "document.xml")  # Path for the XML file
 
         # Write the XML content to the file
         with open(xml_path, 'w', encoding='utf-8') as xmlFile:
-            xmlFile.write(tnsContent)  # Write the XML content to the file
+            xmlFile.write(xmlContent)  # Write the XML content to the file
 
-        # Create the ZIP file with the .tns extension
-        with zipfile.ZipFile(self.tnsPath, 'w') as tnsFile:
-            tnsFile.write(xml_path, 'document.xml')  # Add the XML file to the ZIP archive
-
-        # Clean up the temporary directory
-        os.remove(xml_path)  # Remove the XML file
-        os.rmdir(temp_dir)  # Remove the temporary directory
+        return xml_path
 
     def convertToTns(self):
         # Extract text from the PDF
