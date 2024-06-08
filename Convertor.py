@@ -26,12 +26,12 @@ class PdfToTnsConverter:
     def createTnsFile(self, text):
         # Define the XML structure for a simple TI-Nspire document
         tnsContent = f"""<?xml version="1.0" encoding="utf-8"?>
-        <document xmlns="https://www.ti.com/Nspire-XML/3.0/">
+        <document xmlns="https://www.ti.com/Nspire-XML/3.0/"> 
             <page>
                 <text>{text}</text>
             </page>
         </document>"""
-
+        # this is not right i will attempt to fix 
         # Create a temporary directory to hold the XML file
         temp_dir = "temp_tns"
         os.makedirs(temp_dir, exist_ok=True)  # Ensure the directory exists
